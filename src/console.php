@@ -20,4 +20,16 @@ $console
     })
 ;
 
+$console->addCommands(array(
+    new EulerProject\Command\IndexCommand()
+));
+for ($i = 0; $i < 452; $i++) {
+    $class = "EulerProject\Command\Problem" . $i . "Command";
+    if (class_exists($class)) {
+        $console->addCommands(array(
+            new $class()
+        ));
+    }
+}
+
 return $console;
