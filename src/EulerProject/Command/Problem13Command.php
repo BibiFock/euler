@@ -20,29 +20,16 @@ class Problem13Command extends IndexCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln( "(".($this->getDuration())."s) ----");
+        $return = $this->makeTheSum();
+        $output->writeln("<info>" . $return ."</info> ("
+            . ($this->getDuration()) . "s) ----");
     }
 
-    public function findTriangleDivisor($limit, $output)
+    public function makeTheSum()
     {
-        $sum = $it = 1;
-        $biggestResult = 0;
-        do {
-            $sum += ++$it;
-            $result = $this->getNbDivisor($sum);
-            if (count($result) > $biggestResult) {
-                $biggestResult = count($result);
-            }
-        } while (count($result) < $limit);
-
-        $output->writeln("-------------------");
-        $output->writeln(
-            $sum . " (". count($result)
-            . ") -> " . implode(', ',$result)
-        );
-
-        return $sum;
+        return array_sum($this->digitsList);
     }
+
 
     protected $digitsList = <<<EOF
 37107287533902102798797998220837590246510135740250
