@@ -32,9 +32,7 @@ EOF;
             )
         );
 
-        $this->listPath = array(
-            array(array('x'=> 0, 'y' => 0))
-        );
+        $this->listPath = array();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -43,21 +41,44 @@ EOF;
         $size = intval($input->getOption('size'));
 
         $return = $this->getAllThePath($size);
-        $output->writeln("<info>" . count($return) ."</info> ("
+        //$return = $this->countAllPath($size);
+        $output->writeln("<info>" . $return ."</info> ("
             . ($this->getDuration()) . "s) ----");
         $this->output->writeln("--------------------------------");
     }
 
+    protected function countAllPath($limit)
+    {
+        $count = 0;
+        $y = $x = $limit;
+        do {
+
+        } while ($x < $limit);
+        for ($x = $limit; $x > 0; $x++) {
+             for ($y = 0; $y < count($limit); $y++) {
+                 $count++;
+             }
+        }
+        return $count;
+    }
+
     protected function getAllThePath($limit)
     {
+        $searchPath = array(
+            array(array('x'=> 0, 'y' => 0))
+        );
+        $limit = $limit/2+1;
+        $lastCount = 0;
+        $howMuchWhile = 0;
         do {
+            $howMuchWhile++;
             $return = array();
             $found = false;
 
-            foreach ($this->listPath as $path) {
+            foreach ($searchPath as $path) {
                 end($path);
                 $coord = current($path);
-                if ($coord['y'] == $coord['x'] && $coord['y'] == ($limit)) {
+                if ($limit/2 == $coord['x'] || $coord['y'] == ($limit)) {
                     $return[] = $path;
                     continue;
                 }
@@ -68,7 +89,7 @@ EOF;
                     );
                     $found = true;
                 }
-                if ($coord['x']+1 <= $limit) {
+                if ($coord['x']+1 <= $limit/2) {
                     $return[] = array_merge(
                         $path,
                         array(array('x' => $coord['x']+1, 'y' => $coord['y']))
@@ -76,19 +97,24 @@ EOF;
                     $found = true;
                 }
             }
-            $this->listPath = $return;
-            //$this->output->writeln(implode("\n", array_map(function($row) {
-                //return implode('=>', array_map(function($row) {
-                    //return implode('x', $row);
-                //}, $row));
-            //}, $return)));
-            //$this->output->writeln("Result: " . count($return));
-            //if (!$this->askConfirmation()) {
-                //break;
-            //}
-        } while($found);
+            $searchPath = $return;
+            $this->output->writeln(implode("\n", array_map(function($row) {
+                return implode('=>', array_map(function($row) {
+                    return implode('x', $row);
+                }, $row));
+            }, $return)));
 
-        return $return;
+            if ($lastCount != count($searchPath)) {
+                $lastCount = count($searchPath);
+                $this->output->writeln("Result: " . count($searchPath) . " Finish / " . $lastCount . " path to find");
+                if (!$this->askConfirmation()) {
+                    break;
+                }
+            }
+        } while($found);
+        $this->output->writeln("Nb While: ".$howMuchWhile);
+
+        return count($searchPath);
     }
 
 }

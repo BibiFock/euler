@@ -85,7 +85,7 @@ EOT;
             return false;
         }
 
-        for ($i = 3; $i < ceil(sqrt($nb)); $i +=2 ) {
+        for ($i = 3; $i <= ceil(sqrt($nb)); $i +=2 ) {
             if ($nb%$i == 0) {
                 return false;
             }
