@@ -18,6 +18,8 @@ class IndexCommand extends Command
 The <info>test</info> command does things and stuff
 EOT;
 
+    protected $output = null;
+
     protected $start = null;
 
     public function __construct()
@@ -59,6 +61,15 @@ EOT;
         echo "-----------------------\n";
     }
 
+    protected function AskConfirmation()
+    {
+        $dialog = $this->getHelperSet()->get('dialog');
+        return $dialog->askConfirmation(
+            $this->output,
+            '<question>Continue with this action?</question>',
+            false
+        );
+    }
 
     protected static function isPrime($nb)
     {

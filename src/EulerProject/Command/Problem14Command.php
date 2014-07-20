@@ -45,21 +45,24 @@ EOF;
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $output;
         $limit = intval($input->getOption('limit'));
 
         $return = $this->findLongestChain($limit, $output);
         $output->writeln("<info>" . $return ."</info> ("
             . ($this->getDuration()) . "s) ----");
+        $this->output->writeln("--------------------------------");
     }
 
+    /** other solution **/
     protected function findLongestChain($start, $output)
     {
         $lastResult = $lastStart = 0;
         $limit = 1;
         for ($i = $start; $i >= $limit; $i--) {
             $result = $this->makeTheChain($i, $output);
-            if ($lastResult < count($result)) {
-                $lastResult = count($result);
+            if ($lastResult < $result) {
+                $lastResult = $result;
                 $lastStart = $i;
                 $output->writeln($lastStart . " (<info>".$lastResult."</info>) ". $this->getDuration());
             }
@@ -73,7 +76,7 @@ EOF;
             }
         }
 
-        return $lastStart;
+        return $lastStart ." => ". $lastResult;
     }
 
     protected function makeTheChain($nb, $output)
@@ -81,7 +84,8 @@ EOF;
         if (!empty($lastChain[$nb])) {
             return $lastChain[$nb];
         }
-        $return = array($nb);
+        $chains = array($nb);
+        $comp = 0;
         while ($nb != 1) {
             if ($nb%2 == 0) {
                 $nb = $nb/2;
@@ -89,16 +93,17 @@ EOF;
                 $nb = 3*$nb +1;
             }
             if (!empty($this->listChain[$nb])) {
-                $return = array_merge($return, $this->listChain[$nb]);
+                $comp = $this->listChain[$nb];
                 break;
             }
-            $return[] = $nb;
+            $chains[] = $nb;
         }
-        //$output->writeln("(" . implode(' -> ', $return) . ")");
-        $tmp = $return;
-        while ( !empty($tmp) && empty($this->listChain[$tmp[0]])) {
-            $this->listChain[$tmp[0]] = $tmp;
-            array_shift($tmp);
+        $return = $count = count($chains) + $comp;
+        //$output->writeln("(" . implode(' -> ', $chains) . ") Result: " . $count);
+        while ($count > 0 && empty($this->listChain[current($chains)])) {
+            $this->listChain[current($chains)] = $count--;
+            array_shift($chains);
+            reset($chains);
         }
 
         return $return;
