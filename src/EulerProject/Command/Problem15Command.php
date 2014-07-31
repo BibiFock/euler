@@ -13,8 +13,12 @@ class Problem15Command extends IndexCommand
 {
     protected $listPath = null;
 
+    protected $way = array();
+
     protected function init()
     {
+        parent::init();
+
         $this->help = <<<EOF
 Starting in the top left corner of a 2×2 grid, and only being able to move to the right and down,
  there are exactly 6 routes to the bottom right corner.
@@ -22,14 +26,12 @@ Starting in the top left corner of a 2×2 grid, and only being able to move to t
 
 How many such routes are there through a 20×20 grid?
 EOF;
-        $this->definition = array(
-            new InputOption(
-                'size',
-                's',
-                InputOption::VALUE_OPTIONAL,
-                'Size grid',
-                2
-            )
+        $this->definition[] = new InputOption(
+            'size',
+            's',
+            InputOption::VALUE_OPTIONAL,
+            'Size grid',
+            2
         );
 
         $this->listPath = array();
@@ -37,84 +39,45 @@ EOF;
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
+        parent::execute($input, $output);
+
         $size = intval($input->getOption('size'));
 
-        $return = $this->getAllThePath($size);
-        //$return = $this->countAllPath($size);
-        $output->writeln("<info>" . $return ."</info> ("
+        $return = $this->countAllPath($size);
+        $this->writeln("<info>" . $return ."</info> ("
             . ($this->getDuration()) . "s) ----");
-        $this->output->writeln("--------------------------------");
+        $this->writeln("--------------------------------");
     }
 
-    protected function countAllPath($limit)
-    {
-        $count = 0;
-        $y = $x = $limit;
-        do {
 
-        } while ($x < $limit);
-        for ($x = $limit; $x > 0; $x++) {
-             for ($y = 0; $y < count($limit); $y++) {
-                 $count++;
-             }
+    protected function countAllPath($size, $x = 0, $y = 0)
+    {
+        $positions = array();
+        $key = $x . "x" . $y;
+        if (!empty($this->way[$key])) {
+            return $this->way[$key];
         }
-        return $count;
+
+        if ($x + 1  <= $size) {
+            $positions[] = array($x+1,$y);
+        }
+        if ($y + 1  <= $size) {
+            $positions[] = array($x,$y+1);
+        }
+
+        if (empty($positions)) {
+            return 1;
+        }
+
+        $return = 0;
+        foreach ($positions as $coord) {
+           $return += $this->countAllPath($size, $coord[0], $coord[1]);
+        }
+
+        $this->way[$key] = $return;
+
+        return $return;
     }
 
-    protected function getAllThePath($limit)
-    {
-        $searchPath = array(
-            array(array('x'=> 0, 'y' => 0))
-        );
-        $limit = $limit/2+1;
-        $lastCount = 0;
-        $howMuchWhile = 0;
-        do {
-            $howMuchWhile++;
-            $return = array();
-            $found = false;
-
-            foreach ($searchPath as $path) {
-                end($path);
-                $coord = current($path);
-                if ($limit/2 == $coord['x'] || $coord['y'] == ($limit)) {
-                    $return[] = $path;
-                    continue;
-                }
-                if ($coord['y']+1 <= $limit) {
-                    $return[] = array_merge(
-                        $path,
-                        array(array( 'x' => $coord['x'], 'y' => $coord['y']+1))
-                    );
-                    $found = true;
-                }
-                if ($coord['x']+1 <= $limit/2) {
-                    $return[] = array_merge(
-                        $path,
-                        array(array('x' => $coord['x']+1, 'y' => $coord['y']))
-                    );
-                    $found = true;
-                }
-            }
-            $searchPath = $return;
-            $this->output->writeln(implode("\n", array_map(function($row) {
-                return implode('=>', array_map(function($row) {
-                    return implode('x', $row);
-                }, $row));
-            }, $return)));
-
-            if ($lastCount != count($searchPath)) {
-                $lastCount = count($searchPath);
-                $this->output->writeln("Result: " . count($searchPath) . " Finish / " . $lastCount . " path to find");
-                if (!$this->askConfirmation()) {
-                    break;
-                }
-            }
-        } while($found);
-        $this->output->writeln("Nb While: ".$howMuchWhile);
-
-        return count($searchPath);
-    }
 
 }

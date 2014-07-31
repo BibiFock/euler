@@ -18,6 +18,7 @@ class IndexCommand extends Command
 The <info>test</info> command does things and stuff
 EOT;
 
+    protected $debug = false;
     protected $output = null;
 
     protected $start = null;
@@ -43,7 +44,12 @@ EOT;
 
     protected function init()
     {
-        //todo
+        $this->definition[] = new InputOption(
+            'debug',
+            null,
+            InputOption::VALUE_NONE,
+            'Si défini, mode debug'
+        );
     }
 
     protected function configure()
@@ -56,19 +62,41 @@ EOT;
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        echo "-----------------------\n";
-        echo "----TODO --------------\n";
-        echo "-----------------------\n";
+        $this->output = $output;
+        $this->debug =  ($input->getOption('debug'));
+        if ($this->debug) {
+            $this->output->writeln("<info>-----------------------</info>");
+            $this->output->writeln("<info>DEBUG MODE</info>");
+            $this->output->writeln("<info>-----------------------</info>");
+        }
     }
 
     protected function AskConfirmation()
     {
+        if (!$this->debug) {
+            return true;
+        }
         $dialog = $this->getHelperSet()->get('dialog');
         return $dialog->askConfirmation(
             $this->output,
             '<question>Continue with this action?</question>',
             false
         );
+    }
+
+    protected function writeln($msg, $debug = false)
+    {
+        if ($debug && !$this->debug) {
+            return false;
+        }
+        $this->output->writeln($msg . " (".$this->getMemoryUsage().")");
+    }
+
+    protected function getMemoryUsage()
+    {
+        $size = memory_get_usage();
+        $unit=array('b','kb','mb','gb','tb','pb');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 
     protected static function isPrime($nb)
@@ -111,4 +139,5 @@ EOT;
 
         return $result;
     }
+
 }

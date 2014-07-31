@@ -1,5 +1,7 @@
 <?php
 
+ini_set('memory_limit', '512M');
+
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
