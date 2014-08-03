@@ -71,7 +71,7 @@ EOT;
         }
     }
 
-    protected function AskConfirmation()
+    protected function askConfirmation()
     {
         if (!$this->debug) {
             return true;
