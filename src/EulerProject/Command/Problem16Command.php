@@ -18,9 +18,9 @@ class Problem16Command extends IndexCommand
         parent::init();
 
         $this->help = <<<EOF
-215 = 32768 and the sum of its digits is 3 + 2 + 7 + 6 + 8 = 26.
+2^15 = 32768 and the sum of its digits is 3 + 2 + 7 + 6 + 8 = 26.
 
-What is the sum of the digits of the number 21000?
+What is the sum of the digits of the number 2^1000?
 EOF;
 
         $this->definition[] = new InputOption(
@@ -38,18 +38,16 @@ EOF;
     {
         parent::execute($input, $output);
 
-        $pow = $input->getOption("pow");
+        $pow = intval($input->getOption('pow'));
+        $sum = $this->getDigitSum(pow(2, $pow));
 
-        $result = gmp_pow(2, $pow);
-        $result = gmp_strval($result)."\n";
-        $return = 0;
-        for ($i = 0; $i < strlen($result); $i++) {
-            $return += $result[$i];
-        }
-        $this->writeln("<info>" . $return ."</info> ("
-            . ($this->getDuration()) . "s) ----");
-        $this->writeln("--------------------------------");
+        $this->writeln('<info>' . $sum . '</info>');
     }
-
+    protected function getDigitSum($toSum)
+    {
+        return array_sum(str_split(
+            preg_replace('/[^0-9]/', '', number_format($toSum))
+        ));
+    }
 
 }

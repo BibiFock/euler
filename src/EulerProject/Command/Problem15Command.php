@@ -49,8 +49,33 @@ EOF;
         $this->writeln("--------------------------------");
     }
 
-
     protected function countAllPath($size, $x = 0, $y = 0)
+    {
+        $count = 0;
+        if ($x == $size && $y == $size) {
+            return 1;
+        }
+
+        $key = $x . 'x'. $y;
+
+        if (!empty($this->ways[$key])) {
+            return $this->ways[$key];
+        }
+
+        if ($x + 1 <= $size) {
+            $count += $this->countAllPath($size, $x+1, $y);
+        }
+
+        if ($y + 1 <= $size) {
+            $count += $this->countAllPath($size, $x, $y+1);
+        }
+
+        $this->ways[$key] = $count;
+
+        return $count;
+    }
+
+    protected function countAllPath2($size, $x = 0, $y = 0)
     {
         $positions = array();
         $key = $x . "x" . $y;
@@ -78,6 +103,5 @@ EOF;
 
         return $return;
     }
-
 
 }

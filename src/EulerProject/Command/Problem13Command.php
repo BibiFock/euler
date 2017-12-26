@@ -14,14 +14,22 @@ class Problem13Command extends IndexCommand
 
     protected function init()
     {
+        parent::init();
         $this->help = 'Work out the first ten digits of the sum of the following one-hundred 50-digit numbers.';
         $this->digitsList = explode("\n", $this->digitsList);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        parent::execute($input, $output);
         $return = $this->makeTheSum();
-        $output->writeln("<info>" . $return ."</info> ("
+        $response = substr(
+            str_replace(',', '', number_format($return)),
+            0,
+            10
+        );
+        $output->writeln(
+            "<info>" . $response ."</info> ("
             . ($this->getDuration()) . "s) ----");
     }
 

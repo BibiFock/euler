@@ -55,7 +55,7 @@ EOF;
         parent::execute($input, $output);
 
         $triangleLines = explode("\n", $this->getTriangle());
-        for ($i = 0, $lines = array(); $i < count($triangleLines)/* && $i < 2*/; $i++){
+        for ($i = 0, $lines = array(); $i < count($triangleLines); $i++){
             $lines[] = explode(" ", $triangleLines[$i]);
         }
 
@@ -63,12 +63,26 @@ EOF;
         if ($this->debug) {
             print_r($return);
         }
-        $this->writeln("<info>" . $return['sum'] ."</info> ("
+        $this->writeln("<info>" . $return ."</info> ("
             . ($this->getDuration()) . "s) ----");
         $this->writeln("--------------------------------");
     }
 
-    public function getBestPath($lines, $level = 0, $pos =0)
+    protected function getBestPath($lines)
+    {
+        for ($line = count($lines)-1; $line > 0; $line--) {
+            $row = $lines[$line];
+            for ($i = 0; $i < count($row)-1; $i++) {
+                $indexToAdd = ($row[$i] < $row[$i + 1] ? $i+1 : $i);
+                $lines[$line-1][$i] += $row[$indexToAdd];
+            }
+        }
+
+        return $lines[0][0];
+    }
+
+
+    public function getBestPathOld($lines, $level = 0, $pos =0)
     {
         $return = null;
         $sort = array();

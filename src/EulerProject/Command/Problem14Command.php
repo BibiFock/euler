@@ -41,6 +41,7 @@ EOF;
         );
 
         $this->listChain = array();
+        parent::init();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -49,13 +50,64 @@ EOF;
         $limit = intval($input->getOption('limit'));
 
         $return = $this->findLongestChain($limit, $output);
+
         $output->writeln("<info>" . $return ."</info> ("
             . ($this->getDuration()) . "s) ----");
         $this->output->writeln("--------------------------------");
     }
 
+    protected function findLongestChain($limit, $output)
+    {
+        $nbNode = 0;
+        $number = 0;
+        // for ($i = 2; $i < $limit; $i++) {
+        for ($i = $limit; $i >= 2; $i--) {
+            $nbTerms = $this->howManyTerms(array($i));
+            if ($nbTerms > $nbNode) {
+                $nbNode = $nbTerms;
+                $number = $i;
+            }
+        }
+
+        return $number;
+    }
+
+    protected function howManyTerms($previous)
+    {
+        $start = $previous[0];
+        if (!empty($this->listChain[$start])) {
+            $this->storeList($previous, $this->listChain[$start]);
+            return count($previous) + $this->listChain[$start];
+        }
+
+        if ($start % 2 === 0) {
+            $next = $start/2;
+        } else {
+            $next = 3*$start+1;
+        }
+        array_unshift($previous, $next);
+        if ($next === 1) {
+            $this->storeList($previous);
+            return count($previous);
+        }
+
+        return $this->howManyTerms($previous);
+    }
+
+    protected function storeList($previous, $add = 1)
+    {
+        while (count($previous) > 1) {
+            $last = array_pop($previous);
+            if (!empty($this->listChain[$last])) {
+                break;
+            }
+            $this->listChain[$last] = count($previous) + $add;
+        }
+    }
+
+
     /** other solution **/
-    protected function findLongestChain($start, $output)
+    protected function findLongestChain2($start, $output)
     {
         $lastResult = $lastStart = 0;
         $limit = 1;

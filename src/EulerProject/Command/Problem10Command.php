@@ -35,8 +35,8 @@ EOF;
     {
         $limit = intval($input->getOption('limit'));
         $output->writeln($this->findBiggestPrime($limit) . "(".($this->getDuration())."s) ----)");
-        $this->start = microtime(true);
-        $output->writeln($this->findBiggestPrimeWidthGmp($limit) . "(".($this->getDuration())."s) ----)");
+        // $this->start = microtime(true);
+        // $output->writeln($this->findBiggestPrimeWidthGmp($limit) . "(".($this->getDuration())."s) ----)");
 ;
     }
 

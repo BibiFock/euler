@@ -38,26 +38,22 @@ EOF;
     {
         parent::execute($input, $output);
 
-        $factorial = $input->getOption("factorial");
+        $source = $input->getOption("factorial");
 
-        //$return = $this->getFactorial($factorial);
-        $return = gmp_fact($factorial);
-        $return = gmp_strval($return);
-
-        $this->writeln( $return);
-        $this->writeln("<info>" . array_sum(str_split($return)) ."</info> ("
-            . ($this->getDuration()) . "s) ----");
-        $this->writeln("--------------------------------");
-    }
-
-    protected function getFactorial($value)
-    {
-        $return = 1;
-        for ($i = $value; $i > 0 ; $i--) {
-            $return *= $i;
+        $prod = 1;
+        for ($i = 100; $i > 1; $i--) {
+            $prod = bcmul($i, $prod);
         }
 
-        return $return;
+        $return = array_sum(str_split($prod));
+
+        // $return = gmp_fact($factorial);
+        // $return = gmp_strval($return);
+        // print_r(str_split(preg_replace('/[^0-9]/', '', number_format($factorial))) );
+
+        $this->writeln("<info> digit sum: " . $return . "</info> ("
+            . ($this->getDuration()) . "s) ----");
+        $this->writeln("--------------------------------");
     }
 
 }
