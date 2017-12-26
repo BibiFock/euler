@@ -25,10 +25,10 @@ Evaluate the sum of all the amicable numbers under 10000.
 EOF;
 
         $this->definition[] = new InputOption(
-            'factorial',
-            'f',
+            'limit',
+            'l',
             InputOption::VALUE_OPTIONAL,
-            'factorial value',
+            'limit value',
             10
         );
 
@@ -38,15 +38,55 @@ EOF;
     {
         parent::execute($input, $output);
 
-        $factorial = $input->getOption("factorial");
+        $limit = $input->getOption("limit");
 
-        //$return = $this->getFactorial($factorial);
-       $return = gmp_strval($return);
+        $sumAmicables = $this->getAmicablesSum($limit);
 
-        $this->writeln( $return);
-        $this->writeln("<info>" . array_sum(str_split($return)) ."</info> ("
+        $this->writeln("<info>" . $sumAmicables  ."</info> ("
             . ($this->getDuration()) . "s) ----");
         $this->writeln("--------------------------------");
+    }
+
+    protected function getAmicablesSum($limit)
+    {
+        $amicables = array();
+        for ($i = 1; $i <= $limit; $i++) {
+            if (in_array($i, $amicables)) {
+                continue;
+            }
+
+            $divSum = $this->getDivisorsSum($i);
+            if ($divSum == $i) {
+                continue;
+            }
+            $ddSum = $this->getDivisorsSum($divSum);
+
+            if ($ddSum != $i) {
+                continue;
+            }
+
+            $this->writeln($i . ', ' . $divSum . ' are amicable');
+            $amicables[] = $i;
+            $amicables[] = $divSum;
+        }
+
+        return array_sum($amicables);
+    }
+
+    protected function getDivisorsSum($source)
+    {
+        $limit = $source;
+        $divisors = array(1);
+        for ( $i = 2; $i < $limit; $i++) {
+            if ($source%$i != 0) {
+                continue;
+            }
+            $divisors[] = $i;
+            $divisors[] = $source / $i;
+            $limit = $source / $i;
+        }
+
+        return array_sum($divisors);
     }
 
 }
